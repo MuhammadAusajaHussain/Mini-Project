@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Users Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/4ec0d1496f.js" crossorigin="anonymous"></script>
+</head>
+<body class="flex flex-col min-h-screen bg-gray-50">
+    <%- include('./partials/header') %>
+
+    <div class="flex-1">
+        <div class="flex flex-row">
+            <!-- User Statistics -->
+            <div class="w-1/2 p-6">
+                <div class="text-3xl font-bold text-gray-800 mb-4">User Statistics</div>
+                
+                <!-- Users Per Role - Bar Graph -->
+                <div class="bg-white shadow p-4 h-full rounded-xl">
+                    <p class="text-gray-500 mb-2 font-semibold text-center">Users Per Role (Bar Chart)</p>
+                    <canvas id="rolesBarChart" class="min-w-1/2"></canvas>
+                </div>
+            </div>
+            
+            <!-- User Table -->
+            <div class="w-1/2 p-6">
+                <div class="text-3xl font-bold text-gray-800 mb-4">Current Users</div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-center table-auto border border-black bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead class="bg-gray-200">
+                            <tr class="text-lg border border-black">
+                                <th class="py-2 px-4">User ID</th>
+                                <th class="py-2 px-4">Name</th>
+                                <th class="py-2 px-4">Email</th>
+                                <th class="py-2 px-4">Age</th>
+                                <th class="py-2 px-4">Role</th>
+                                <th class="py-2 px-4">Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% users.forEach(user => { %>
+                                <tr class="border-t border-black">
+                                <td class="py-2 px-4"><%= user.id %></td>
+                                <td class="py-2 px-4"><%= user.name %></td>
+                                <td class="py-2 px-4"><%= user.email %></td>
+                                <td class="py-2 px-4"><%= user.age %></td>
+                                <td class="py-2 px-4"><%= user.role %></td>
+                                <% if (String(user.isActive).toLowerCase() === 'true') { %>
+                                    <td class="py-2 px-4 font-bold text-green-700">Active</td>
+                                <% } else { %>
+                                    <td class="py-2 px-4 font-bold text-red-700">Inactive</td>
+                                <% } %>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('./partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Safely inject server-side data into client-side JS
+        const roleLabels = JSON.parse('<%- JSON.stringify(roles.map(r => r.name)) %>');
+        const roleCounts = JSON.parse('<%- JSON.stringify(roles.map(r => r.count)) %>');
+
+        const ctx = document.getElementById('rolesBarChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: roleLabels,
+                datasets: [{
+                    label: 'Users by Role',
+                    data: roleCounts,
+                    backgroundColor: [
+                    '#60a5fa', '#34d399', '#f87171', '#fbbf24', '#a78bfa'
+                    ],
+                    borderRadius: 6,
+                    barPercentage: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 0.5
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

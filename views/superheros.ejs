@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superheros Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/4ec0d1496f.js" crossorigin="anonymous"></script>
+</head>
+<body class="flex flex-col h-screen">
+    <%- include('./partials/header') %>
+
+    <div class="flex-1 p-5">
+        <div class="flex flex-row">
+            <!-- Superhero Statistics -->
+            <div class="w-1/2 p-6">
+                <div class="text-3xl font-bold text-gray-800 mb-4">Superheros Statistics</div>
+                <!-- Superhero Piechart based on team -->
+                <div class="bg-white shadow p-4 rounded-xl">
+                    <p class="text-gray-500 text-center mb-2">Superheroes by Team</p>
+                    <canvas id="teamPieChart" class="mx-auto w-2/3 h-80"></canvas>
+                </div>
+            </div>
+            
+            <!-- Superhero Table -->
+            <div class="w-1/2 p-6">
+                <div class="text-3xl font-bold text-gray-800 mb-4">Current Superhero data available</div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-center table-auto border border-black bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead class="bg-gray-200">
+                            <tr class="text-lg border border-black">
+                                <th class="py-2 px-4">Name</th>
+                                <th class="py-2 px-4">Alias</th>
+                                <th class="py-2 px-4">Powers</th>
+                                <th class="py-2 px-4">Origin</th>
+                                <th class="py-2 px-4">Team</th>
+                                <th class="py-2 px-4"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% superheros.forEach(superhero => { %>
+                                <tr class="border-t border-black">
+                                    <td class="py-2 px-4"><%= superhero.name %></td>
+                                    <td class="py-2 px-4"><%= superhero.alias %></td>
+                                    <td class="py-2 px-4">
+                                        <% superhero.powers.forEach(power => { %>
+                                            <div><%= power %></div>
+                                        <% }); %>
+                                    </td>
+                                    <td class="py-2 px-4"><%= superhero.origin %></td>
+                                    <td class="py-2 px-4"><%= superhero.team %></td>
+                                    <td class="py-2 px-4 font-bold">
+                                        <% if (String(superhero.isActive).toLowerCase() === 'true') { %>
+                                            <span class="text-green-700">Active</span>
+                                        <% } else { %>
+                                            <span class="text-red-700">Inactive</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('./partials/footer') %>
+
+<!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const teamCounts = JSON.parse('<%- JSON.stringify(teamCounts) %>');
+
+        const ctx = document.getElementById('teamPieChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: Object.keys(teamCounts),
+                datasets: [{
+                    data: Object.values(teamCounts),
+                    backgroundColor: [
+                        'red',
+                        'blue',
+                        '#4F46E5',
+                        '#8B5CF6',
+                        '#6366F1',
+                        '#10B981',
+                        '#F59E0B',
+                        '#EF4444',
+                        
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Superheroes by Team'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
